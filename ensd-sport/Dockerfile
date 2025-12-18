@@ -4,20 +4,20 @@ FROM python:3.12-slim
 # Рабочая директория внутри контейнера
 WORKDIR /usr/src/app
 
-# Копируем файлы с зависимостями
+# Копируем файл зависимостей
 COPY requirements.txt ./
 
-# Устанавливаем зависимости Python
+# Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем весь проект
+# Копируем весь проект внутрь контейнера
 COPY . .
 
-# Открываем порт 3000 для Mini App (aiohttp)
+# Создаём папку для данных, если нужна
+RUN mkdir -p /app/data && chmod 777 /app/data
+
+# Открываем порт 3000 для Mini App
 EXPOSE 3000
 
-# Переменная окружения с токеном (можно задавать на Ботхосте)
-# ENV BOT_TOKEN=ваш_токен_бота
-
 # Запуск бота
-CMD ["python", "main.py"]
+CMD ["python", "ensd-sport/main.py"]
