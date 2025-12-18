@@ -24,21 +24,21 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
 // API: Получить прогнозы
 app.get('/api/forecasts', (req, res) => {
     const { sport, is_vip, user_id } = req.query;
-    let query = SELECT * FROM forecasts WHERE 1=1;
+    let query = `SELECT * FROM forecasts WHERE 1=1`;
     const params = [];
 
     if (sport && sport !== 'all') {
-        query +=  AND sport = ?;
+        query += ` AND sport = ?`;
         params.push(sport);
     }
 
     if (is_vip === 'true') {
-        query +=  AND is_vip = 1;
+        query += ` AND is_vip = 1`;
     } else if (is_vip === 'false') {
-        query +=  AND is_vip = 0;
+        query += ` AND is_vip = 0`;
     }
 
-    query +=  ORDER BY created_at DESC LIMIT 50;
+    query += ` ORDER BY created_at DESC LIMIT 50`;
 
     db.all(query, params, (err, forecasts) => {
         if (err) {
@@ -49,7 +49,7 @@ app.get('/api/forecasts', (req, res) => {
         // Если передан user_id, отмечаем просмотренные прогнозы
         if (user_id) {
             db.all(
-                SELECT forecast_id FROM views WHERE user_id IN (SELECT id FROM users WHERE telegram_id = ?),
+                `SELECT forecast_id FROM views WHERE user_id IN (SELECT id FROM users WHERE telegram_id = ?)`,
                 [user_id],
                 (err, views) => {
                     if (err) {
@@ -77,7 +77,7 @@ app.get('/api/user/:telegram_id', (req, res) => {
     const telegram_id = req.params.telegram_id;
 
     db.get(
-        SELECT id, telegram_id, username, balance, daily_streak, vip_expiry FROM users WHERE telegram_id = ?,
+        `SELECT id, telegram_id, username, balance, daily_streak, vip_expiry FROM users WHERE telegram_id = ?`,
         [telegram_id],
         (err, user) => {
             if (err) {
@@ -111,7 +111,7 @@ app.post('/api/view', (req, res) => {
 
     // Проверяем, не смотрел ли уже
     db.get(
-        SELECT id FROM views WHERE user_id = ? AND forecast_id = ?,
+        `SELECT id FROM views WHERE user_id = ? AND forecast_id = ?`,
         [user_id, forecast_id],
         (err, view) => {
             if (err) {
@@ -125,16 +125,17 @@ app.post('/api/view', (req, res) => {
 
             // Добавляем просмотр
             db.run(
-                INSERT INTO views (user_id, forecast_id) VALUES (?, ?),
+                `INSERT INTO views (user_id, forecast_id) VALUES (?, ?)`,
                 [user_id, forecast_id],
                 function(err) {
-                    if (err) {console.error('❌ Ошибка добавления просмотра:', err);
+                    if (err) {
+                        console.error('❌ Ошибка добавления просмотра:', err);
                         return res.status(500).json({ error: 'Ошибка сервера' });
                     }
 
                     // Начисляем баллы
                     db.run(
-                        UPDATE users SET balance = balance + 2 WHERE id = ?,
+                        `UPDATE users SET balance = balance + 2 WHERE id = ?`,
                         [user_id],
                         (err) => {
                             if (err) {
@@ -170,7 +171,7 @@ app.post('/api/admin/forecast', (req, res) => {
 
     // Проверка прав администратора
     db.get(
-        SELECT id FROM admins WHERE telegram_id = ?,
+        `SELECT id FROM admins WHERE telegram_id = ?`,
         [admin_id],
         (err, admin) => {
             if (err || !admin) {
@@ -205,7 +206,7 @@ app.get('/api/admin/stats', (req, res) => {
 
     // Проверка прав администратора
     db.get(
-        SELECT id FROM admins WHERE telegram_id = ?,
+        `SELECT id FROM admins WHERE telegram_id = ?`,
         [admin_id],
         (err, admin) => {
             if (err || !admin) {
@@ -267,7 +268,7 @@ app.get('/admin', (req, res) => {
     
     // Проверяем права администратора
     db.get(
-        SELECT id FROM admins WHERE telegram_id = ?,
+        `SELECT id FROM admins WHERE telegram_id = ?`,
         [user_id],
         (err, admin) => {
             if (err || !admin) {
