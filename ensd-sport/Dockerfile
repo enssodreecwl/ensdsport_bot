@@ -1,13 +1,11 @@
-# Используем официальный образ Python
+# Базовый образ Python
 FROM python:3.12-slim
 
 # Рабочая директория внутри контейнера
 WORKDIR /usr/src/app
 
-# Копируем файл зависимостей
+# Копируем зависимости и устанавливаем их
 COPY requirements.txt ./
-
-# Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Копируем весь проект внутрь контейнера
@@ -19,5 +17,5 @@ RUN mkdir -p /app/data && chmod 777 /app/data
 # Открываем порт 3000 для Mini App
 EXPOSE 3000
 
-# Запуск бота
+# Запуск Python бота
 CMD ["python", "ensd-sport/main.py"]
