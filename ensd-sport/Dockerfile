@@ -1,21 +1,35 @@
-# Базовый образ Python
+# ====== Base image ======
 FROM python:3.12-slim
 
-# Рабочая директория внутри контейнера
+# ====== Install system dependencies + Node ======
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    build-essential \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# ====== Working directory ======
 WORKDIR /usr/src/app
 
-# Копируем зависимости и устанавливаем их
-COPY requirements.txt ./
+# ====== Copy Python dependencies ======
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем весь проект внутрь контейнера
+# ====== Copy Node dependencies ======
+COPY package*.json ./
+RUN npm install
+
+# ====== Copy full project ======
 COPY . .
 
-# Создаём папку для данных, если нужна
-RUN mkdir -p /app/data && chmod 777 /app/data
+# ====== Build frontend ======
+RUN npm run build
 
-# Открываем порт 3000 для Mini App
-EXPOSE 3000
+# ====== Expose port for Render ======
+EXPOSE 10000
 
-# Запуск Python бота
-CMD ["python", "ensd-sport/main.py"]
+# ====== Start Node server (Python bot запускается внутри index.ts) ======
+CMD ["node", "server/index.js"]
