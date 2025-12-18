@@ -1,0 +1,34 @@
+{
+  "name": "ensd-sport-bot",
+  "version": "1.0.0",
+  "description": "ENSD SPORT Telegram Bot with Mini App",
+  "main": "main.py",
+  "scripts": {
+    "start": "python main.py",
+    "dev": "concurrently \"npm run server\" \"npm run bot\"",
+    "server": "node server/index.js",
+    "bot": "python main.py",
+    "docker:build": "docker build -t ensd-sport .",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "setup": "pip install -r requirements.txt && cd server && npm install"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "sports",
+    "forecasts",
+    "aiogram"
+  ],
+  "author": "ENSD Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "python": ">=3.10"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
