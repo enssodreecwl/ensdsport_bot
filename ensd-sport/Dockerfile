@@ -4,8 +4,8 @@ FROM node:20
 # Рабочая директория внутри контейнера
 WORKDIR /usr/src/app
 
-# Копируем package.json и tsconfig.json из папки ensd-sport
-COPY ensd-sport/package*.json ensd-sport/tsconfig.json ./
+# Копируем package.json и package-lock.json, tsconfig.json
+COPY package*.json tsconfig.json ./
 
 # Устанавливаем зависимости
 RUN npm install
@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 3000
 
 # Запускаем бота
-CMD ["npx", "ts-node", "ensd-sport/server/index.ts"]
+CMD ["npx", "ts-node", "server/index.ts"]
